@@ -201,7 +201,7 @@ final class GovernanceController
 
         // Dropdown lookups for inline modals
         $companies = $pdo->query("SELECT id, name FROM companies ORDER BY name")->fetchAll();
-        $directors = $pdo->query("SELECT id, name FROM shareholders WHERE shareholder_type='director' AND status='active' ORDER BY sort_order, name")->fetchAll();
+        $directors = $pdo->query("SELECT id, name FROM shareholders WHERE shareholder_type='director' ORDER BY sort_order, name")->fetchAll();
         $bankAccounts = $pdo->query("SELECT id, bank_name, masked_account FROM company_bank_accounts WHERE status='active' ORDER BY bank_name")->fetchAll();
 
         AuditService::log('viewed', 'shareholders', $selectedId ?: null, 'Unified Partner tab viewed.');
