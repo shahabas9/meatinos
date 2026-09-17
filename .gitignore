@@ -1,0 +1,60 @@
+# Dependencies
+/vendor/
+/node_modules/
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+secrets/
+config/local.php
+
+# Logs and runtime data
+*.log
+logs/
+storage/logs/
+storage/uploads/
+storage/reports/
+/tmp/
+*.tmp
+*.pid
+
+# Cache / generated files
+.cache/
+.phpunit.result.cache
+coverage/
+*.cache
+*.sqlite
+*.sqlite3
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Composer / PHP artifacts
+composer.phar
+.php_cs.cache
+
+# Uploads and generated app data
+uploads/
+public/uploads/
+public/assets/cache/
+
+# Legacy build / local overrides
+*.local
+*.bak
+
+# Optional: exclude local install state if present
+public/install.php
+public/update.php
+
+# If you keep custom local config, uncomment as needed
+# config/*.local.php

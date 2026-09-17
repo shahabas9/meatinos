@@ -1,0 +1,12 @@
+MeatinOS cPanel Distribution
+Version: 2.6.0
+Runtime: PHP 8.2+ / MySQL 8+ or MariaDB 10.4+
+Web root: public/
+Installer: public/install.php
+Updater: public/update.php (authenticated settings administrator; backup confirmation required)
+Demo transactions: none
+Development/demo seed utilities: excluded
+India defaults: INR, GST terminology, Asia/Kolkata
+AI: disabled by default; Admin may add an encrypted OpenAI API key after installation
+Seeded roles: 29 operational roles; installer creates Admin, Finance/Accounts Manager, and HR Manager accounts
+Start with CPANEL_INSTALL.md

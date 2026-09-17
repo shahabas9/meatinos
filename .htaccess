@@ -1,0 +1,6 @@
+Options -Indexes
+RewriteEngine On
+RewriteRule ^(?:app|bin|config|database|storage|tests)(?:/|$) - [F,L,NC]
+<FilesMatch "^(?:\.env(?:\..*)?|\.gitignore|.*\.(?:sql|log))$">
+    Require all denied
+</FilesMatch>
