@@ -303,7 +303,7 @@ final class ModuleController
             if ($name === 'employee_benefits') {
                 redirect('module', ['name' => 'employees', 'tab' => 'benefits']);
             }
-            $workflowEntity = ['purchase_orders'=>'purchase_order','bird_receipts'=>'bird_receipt','production_batches'=>'production_batch','sales_orders'=>'sales_order','goods_receipts'=>'goods_receipt'][$name] ?? null;
+            $workflowEntity = ['purchase_orders'=>'purchase_order','bird_receipts'=>'bird_receipt','production_batches'=>'production_batch','production_requirements'=>'production_requirement','sales_orders'=>'sales_order','goods_receipts'=>'goods_receipt'][$name] ?? null;
             if ($workflowEntity) redirect('workflow', ['entity'=>$workflowEntity,'id'=>$id]);
         }
         if ($name === 'employee_benefits') {

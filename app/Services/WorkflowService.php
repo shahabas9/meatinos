@@ -34,6 +34,10 @@ final class WorkflowService
                 'goods_receipt:reject' => $this->rejectGoodsReceipt($id),
                 'bird_receipt:release' => $this->releaseBirdReceipt($id),
                 'bird_receipt:reject' => $this->rejectBirdReceipt($id),
+                'production_requirement:plan' => $this->planProductionRequirement($id),
+                'production_requirement:start' => $this->startProductionRequirement($id),
+                'production_requirement:fulfill' => $this->fulfillProductionRequirement($id),
+                'production_requirement:cancel' => $this->cancelProductionRequirement($id),
                 'production_batch:start' => $this->startProduction($id),
                 'production_batch:advance' => $this->advanceProduction($id, $input),
                 'sales_order:submit' => $this->submitSalesOrder($id),
@@ -291,6 +295,42 @@ final class WorkflowService
         $this->pdo->prepare("UPDATE bird_receipts SET status='rejected',vet_status='rejected' WHERE id=?")->execute([$id]);
         $this->auditTransition('bird_receipts', $id, (string) $receipt['status'], 'rejected');
         return 'Bird receipt rejected and blocked from production.';
+    }
+
+    private function planProductionRequirement(int $id): string
+    {
+        $requirement = $this->row('production_requirements', $id);
+        $this->expect($requirement['status'] === 'open', 'Only an open production requirement can be planned.');
+        $this->pdo->prepare("UPDATE production_requirements SET status='planned',updated_at=NOW() WHERE id=?")->execute([$id]);
+        $this->auditTransition('production_requirements', $id, 'open', 'planned');
+        return 'Production requirement status updated to planned.';
+    }
+
+    private function startProductionRequirement(int $id): string
+    {
+        $requirement = $this->row('production_requirements', $id);
+        $this->expect($requirement['status'] === 'planned', 'Only a planned production requirement can be started.');
+        $this->pdo->prepare("UPDATE production_requirements SET status='in_progress',updated_at=NOW() WHERE id=?")->execute([$id]);
+        $this->auditTransition('production_requirements', $id, 'planned', 'in_progress');
+        return 'Production requirement status updated to in progress.';
+    }
+
+    private function fulfillProductionRequirement(int $id): string
+    {
+        $requirement = $this->row('production_requirements', $id);
+        $this->expect($requirement['status'] === 'in_progress', 'Only an in-progress production requirement can be marked fulfilled.');
+        $this->pdo->prepare("UPDATE production_requirements SET status='fulfilled',updated_at=NOW() WHERE id=?")->execute([$id]);
+        $this->auditTransition('production_requirements', $id, 'in_progress', 'fulfilled');
+        return 'Production requirement marked as fulfilled.';
+    }
+
+    private function cancelProductionRequirement(int $id): string
+    {
+        $requirement = $this->row('production_requirements', $id);
+        $this->expect(in_array($requirement['status'], ['open', 'planned', 'in_progress'], true), 'This production requirement cannot be cancelled.');
+        $this->pdo->prepare("UPDATE production_requirements SET status='cancelled',updated_at=NOW() WHERE id=?")->execute([$id]);
+        $this->auditTransition('production_requirements', $id, (string) $requirement['status'], 'cancelled');
+        return 'Production requirement cancelled.';
     }
 
     private function startProduction(int $id): string
@@ -1219,7 +1259,7 @@ final class WorkflowService
 
     private function row(string $table, int $id): array
     {
-        $allowed = ['purchase_orders', 'goods_receipts', 'bird_receipts', 'production_batches', 'sales_orders', 'invoices', 'payments', 'supplier_invoices', 'supplier_payments', 'dispatches', 'inventory_lots', 'customers', 'suppliers', 'operating_expenses', 'partner_transactions', 'partner_dividends', 'salary_advances', 'asset_depreciation_entries', 'assets'];
+        $allowed = ['purchase_orders', 'goods_receipts', 'bird_receipts', 'production_batches', 'production_requirements', 'sales_orders', 'invoices', 'payments', 'supplier_invoices', 'supplier_payments', 'dispatches', 'inventory_lots', 'customers', 'suppliers', 'operating_expenses', 'partner_transactions', 'partner_dividends', 'salary_advances', 'asset_depreciation_entries', 'assets'];
         if (!in_array($table, $allowed, true)) {
             throw new \InvalidArgumentException('Unsafe workflow table.');
         }

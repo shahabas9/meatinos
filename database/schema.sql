@@ -184,16 +184,26 @@ CREATE TABLE IF NOT EXISTS purchase_order_items (
 CREATE TABLE IF NOT EXISTS bird_receipts (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     batch_number VARCHAR(50) NOT NULL UNIQUE,
+    plant_id BIGINT UNSIGNED NULL,
     supplier_id BIGINT UNSIGNED NOT NULL,
     purchase_order_id BIGINT UNSIGNED NULL,
+    farm_id BIGINT UNSIGNED NULL,
     farm_name VARCHAR(150) NOT NULL,
     vehicle_number VARCHAR(40) NOT NULL,
+    vehicle_id BIGINT UNSIGNED NULL,
+    driver_id BIGINT UNSIGNED NULL,
+    crate_count INT UNSIGNED NOT NULL DEFAULT 0,
     received_at DATETIME NOT NULL,
+    unloading_time DATETIME NULL,
     bird_count INT UNSIGNED NOT NULL,
+    received_quantity DECIMAL(14,3) NOT NULL DEFAULT 0,
     mortality_count INT UNSIGNED NOT NULL DEFAULT 0,
     gross_weight_kg DECIMAL(14,3) NOT NULL,
+    tare_weight_kg DECIMAL(14,3) NOT NULL DEFAULT 0,
     net_weight_kg DECIMAL(14,3) NOT NULL,
     sample_avg_weight_kg DECIMAL(8,3) NULL,
+    unit_purchase_cost DECIMAL(14,3) NOT NULL DEFAULT 0,
+    total_value DECIMAL(14,2) NOT NULL DEFAULT 0,
     quality_observation TEXT NULL,
     vet_certificate VARCHAR(100) NULL,
     vet_status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
@@ -203,9 +213,15 @@ CREATE TABLE IF NOT EXISTS bird_receipts (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_receipts_date (received_at),
     INDEX idx_receipts_supplier (supplier_id),
+    INDEX idx_bird_plant (plant_id),
+    INDEX idx_bird_farm (farm_id),
     CONSTRAINT fk_receipt_supplier FOREIGN KEY (supplier_id) REFERENCES suppliers(id),
     CONSTRAINT fk_receipt_po FOREIGN KEY (purchase_order_id) REFERENCES purchase_orders(id) ON DELETE SET NULL,
-    CONSTRAINT fk_receipt_user FOREIGN KEY (received_by) REFERENCES users(id) ON DELETE SET NULL
+    CONSTRAINT fk_receipt_user FOREIGN KEY (received_by) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_bird_plant FOREIGN KEY (plant_id) REFERENCES plants(id) ON DELETE SET NULL,
+    CONSTRAINT fk_bird_farm FOREIGN KEY (farm_id) REFERENCES farms(id) ON DELETE SET NULL,
+    CONSTRAINT fk_bird_vehicle FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE SET NULL,
+    CONSTRAINT fk_bird_driver FOREIGN KEY (driver_id) REFERENCES employees(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS production_batches (

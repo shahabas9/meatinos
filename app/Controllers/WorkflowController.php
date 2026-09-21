@@ -19,6 +19,7 @@ final class WorkflowController
         'goods_receipt' => ['table' => 'goods_receipts', 'module' => 'goods_receipts', 'permission' => 'purchase', 'title' => 'Goods Receipt Workflow', 'number' => 'grn_number'],
         'bird_receipt' => ['table' => 'bird_receipts', 'module' => 'bird_receipts', 'permission' => 'production', 'title' => 'Live Bird Release Workflow', 'number' => 'batch_number'],
         'production_batch' => ['table' => 'production_batches', 'module' => 'production_batches', 'permission' => 'production', 'title' => 'Production Stage Workflow', 'number' => 'batch_number'],
+        'production_requirement' => ['table' => 'production_requirements', 'module' => 'production_requirements', 'permission' => 'production', 'title' => 'Production Requirement Workflow', 'number' => 'requirement_number'],
         'sales_order' => ['table' => 'sales_orders', 'module' => 'sales_orders', 'permission' => 'sales', 'title' => 'Sales Fulfilment Workflow', 'number' => 'order_number'],
         'invoice' => ['table' => 'invoices', 'module' => 'invoices', 'permission' => 'finance', 'title' => 'Invoice Posting Workflow', 'number' => 'invoice_number'],
         'payment' => ['table' => 'payments', 'module' => 'payments', 'permission' => 'finance', 'title' => 'Payment Clearing Workflow', 'number' => 'payment_number'],
@@ -251,6 +252,12 @@ final class WorkflowController
             },
             'bird_receipt' => in_array($status, ['quarantine', 'accepted'], true) ? [['release', 'Veterinary release', 'success'], ['reject', 'Reject batch', 'danger']] : [],
             'production_batch' => $status === 'scheduled' ? [['start', 'Start production', 'success']] : (in_array($status, ['in_progress', 'hold'], true) ? [['advance', 'Record stage & continue', 'primary']] : []),
+            'production_requirement' => match ($status) {
+                'open' => [['plan', 'Plan fulfillment', 'primary'], ['cancel', 'Cancel requirement', 'outline-danger']],
+                'planned' => [['start', 'Start fulfillment', 'success'], ['cancel', 'Cancel requirement', 'outline-danger']],
+                'in_progress' => [['fulfill', 'Mark as fulfilled', 'success'], ['cancel', 'Cancel requirement', 'outline-danger']],
+                default => [],
+            },
             'sales_order' => match ($status) {
                 'draft' => [['submit', 'Submit for approval', 'primary'], ['cancel', 'Cancel order', 'outline-danger']],
                 'pending' => [['approve', 'Approve & allocate FEFO', 'success'], ['cancel', 'Reject / cancel', 'outline-danger']],

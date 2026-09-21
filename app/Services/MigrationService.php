@@ -101,7 +101,7 @@ final class MigrationService
                             $pdo->exec($statement);
                         } catch (Throwable $statementException) {
                             $msg = $statementException->getMessage();
-                            if (str_contains($msg, 'Duplicate column name') || str_contains($msg, 'Duplicate key name')) {
+                            if (str_contains($msg, 'Duplicate column name') || str_contains($msg, 'Duplicate key name') || str_contains($msg, 'Duplicate foreign key constraint name') || str_contains($msg, 'already exists')) {
                                 continue;
                             }
                             throw $statementException;
